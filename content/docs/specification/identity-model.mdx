@@ -1,0 +1,181 @@
+# 身份与哈希模型
+
+> **状态**: 草稿  
+> **版本**: 1.0.0-alpha
+
+## 概述
+
+本文档定义了 Canyon 的身份和哈希系统。它描述了不同类型的哈希如何计算、它们代表什么以及它们之间的关系。
+
+## 哈希类型
+
+Canyon 使用多种哈希类型，每种类型都有特定的用途：
+
+### mapHash
+
+**用途**: 标识插桩代码的结构
+
+**计算来源**:
+```
+mapHash = hash(
+  relativeFilePath +
+  coverageMapStructure +
+  sourceMapVersion +
+  pluginVersion +
+  schemaVersion
+)
+```
+
+**特性**:
+- ✅ 可在多个构建中重用
+- ✅ 独立于构建上下文
+- ✅ 跨环境稳定
+- ❌ 不包含: repoID, sha, pipeline, buildTarget
+
+**使用位置**: Hit 载荷, Map 载荷
+
+### buildHash
+
+**用途**: 标识特定的构建/执行实例
+
+**计算来源**:
+```
+buildHash = hash(
+  provider +
+  repoID +
+  commitSha +
+  buildTarget +
+  // 可选: pipelineId, jobId, reportProvider, reportID
+)
+```
+
+**特性**:
+- ✅ 每个构建实例唯一
+- ✅ 标识特定的构建/执行
+- ❌ 不包含: 标签 (标签是属性，不是身份)
+
+**使用位置**: 构建记录, Hit 载荷中可选
+
+### sceneKey
+
+**用途**: 标识执行上下文/场景
+
+**计算来源**:
+```
+sceneKey = hash(
+  source +      // automation, manual, replay
+  type +        // e2e, unit, integration
+  env +         // test, staging, prod
+  trigger       // pipeline, schedule, manual
+)
+```
+
+**特性**:
+- ✅ 标准化 (小写, 排序)
+- ✅ 用于聚合桶
+- ❌ 不是合并身份的一部分 (结构决定合并)
+
+**使用位置**: Hit 载荷, 场景记录
+
+### fileContentHash
+
+**用途**: 标识源文件内容
+
+**计算来源**:
+```
+fileContentHash = hash(
+  normalize(sourceCode)
+)
+```
+
+**标准化**:
+- 统一行结束符 (LF)
+- 移除 BOM
+- 可选: 修剪尾部空白
+
+**特性**:
+- ✅ 独立于构建/执行
+- ✅ 可用于代码去重
+- ❌ 不包含: 插桩, sourcemap
+
+**使用位置**: Map 载荷
+
+## 哈希算法
+
+### 当前算法
+
+Canyon 使用稳定、确定性的哈希算法：
+
+```typescript
+function generateObjectSignature(fields: Record<string, string>): string {
+  // 1. 对键进行排序
+  // 2. 规范化值
+  // 3. 生成哈希 (例如, SHA-256)
+  // 4. 返回十六进制字符串
+}
+```
+
+### 版本控制
+
+哈希算法必须进行版本控制：
+
+```typescript
+hash_v1(...)  // 当前版本
+hash_v2(...)  // 未来版本 (如需)
+```
+
+**迁移规则**: 旧哈希保持有效，新哈希使用新算法。
+
+## 身份规则
+
+### 规则 1: 一个哈希，一个用途
+
+每个哈希正好回答一个问题：
+
+- `mapHash`: 代码结构是什么？
+- `buildHash`: 哪个构建实例？
+- `sceneKey`: 执行上下文是什么？
+- `fileContentHash`: 源内容是什么？
+
+### 规则 2: 不可变性
+
+一旦分配，身份永远不会改变：
+
+- 相同输入 → 相同哈希 (确定性)
+- 不同输入 → 不同哈希 (抗碰撞)
+
+### 规则 3: 哈希中无业务逻辑
+
+哈希不应包含：
+- ❌ Pipeline IDs
+- ❌ Job IDs  
+- ❌ Report IDs
+- ❌ 标签 (这些是属性，不是身份)
+
+## 常见模式
+
+### 模式 1: 映射重用
+
+相同代码结构 → 相同 `mapHash` → 可在多个构建中重用
+
+### 模式 2: 构建聚合
+
+相同构建实例 → 相同 `buildHash` → 聚合所有覆盖率
+
+### 模式 3: 场景过滤
+
+相同执行上下文 → 相同 `sceneKey` → 过滤/比较覆盖率
+
+## 碰撞处理
+
+虽然碰撞极为罕见：
+
+1. **预防**: 使用强哈希算法 (SHA-256+)
+2. **检测**: 数据库唯一约束
+3. **解决**: 包含额外上下文 (pluginVersion, schemaVersion)
+
+## 下一步
+
+- [覆盖率数据模型](/docs/specification/data-model) - 实体关系
+- [合并语义](/docs/specification/merge-semantics) - 身份如何影响合并
+

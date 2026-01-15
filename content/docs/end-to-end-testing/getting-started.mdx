@@ -1,0 +1,18 @@
+import { Steps, Callout, Cards } from "nextra/components";
+
+# 快速开始
+
+与单元测试不同，端到端测试会启动浏览器。我们的目标是在浏览器内收集覆盖率数据，因此复杂度相对较高。以下是一般流程：
+
+- 暴露浏览器全局变量，在适当的时机将覆盖率数据写入本地
+- UI自动化完成后，使用[Tools CLI](/docs/ecosystem/tools-cli)读取本地`.canyon_output`目录中的覆盖率数据并聚合上报
+- 将caseID与[Report ID](/docs/core-concepts/report-id)关联，确保用例可追溯
+
+## 框架
+
+<Cards>
+  <Cards.Card
+    title="Playwright"
+    href="/docs/end-to-end-testing/playwright"
+  />
+</Cards>

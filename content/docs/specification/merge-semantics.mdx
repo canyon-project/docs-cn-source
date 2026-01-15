@@ -1,0 +1,176 @@
+# 合并语义
+
+> **状态**: 草稿  
+> **版本**: 1.0.0-alpha
+
+## 概述
+
+本文档定义了覆盖率命中何时以及如何可以合并。它建立了控制覆盖率数据聚合的规则并确保正确性。
+
+## 合并身份
+
+覆盖率命中**只有在**它们共享相同的合并身份时才能合并：
+
+```
+mergeIdentity = buildHash + mapHash + sceneKey
+```
+
+### 组成部分
+
+1. **buildHash**: 相同的构建实例
+2. **mapHash**: 相同的插桩结构  
+3. **sceneKey**: 相同的执行上下文
+
+所有三个必须匹配，命中才能合并。
+
+## 合并规则
+
+### 规则 1: 结构决定合并
+
+✅ **可以合并**:
+- 相同的 `mapHash` + 相同的 `sceneKey`
+- 来自相同执行上下文的多个命中
+- 同一测试用例的重试
+
+❌ **不能合并**:
+- 不同的 `mapHash` (不同的代码结构)
+- 不同的 `sceneKey` (不同的执行上下文)
+- 不同的 `buildHash` (不同的构建实例)
+
+### 规则 2: 标签不影响合并
+
+标签是**过滤维度**，不是合并身份：
+
+```javascript
+// 这些可以合并 (相同的 mergeIdentity)
+hit1 = { mapHash: "abc", sceneKey: "xyz", tags: { type: "auto" } }
+hit2 = { mapHash: "abc", sceneKey: "xyz", tags: { type: "manual" } }
+
+// 这些不能合并 (不同的 sceneKey)
+hit3 = { mapHash: "abc", sceneKey: "xyz", tags: { env: "test" } }
+hit4 = { mapHash: "abc", sceneKey: "uvw", tags: { env: "prod" } }
+```
+
+### 规则 3: 幂等性
+
+合并是**幂等的**：
+
+```
+merge(hit1, hit2) === merge(merge(hit1, hit2), hit2)
+```
+
+相同的命中多次合并产生相同的结果。
+
+## 合并操作
+
+### 命中合并
+
+合并命中时，计数会**求和**：
+
+```javascript
+hit1 = { hits: { "s": { "1": 3, "2": 1 } } }
+hit2 = { hits: { "s": { "1": 2, "2": 0 } } }
+
+merged = {
+  hits: {
+    "s": { "1": 5, "2": 1 }  // 求和
+  }
+}
+```
+
+### 分支合并
+
+分支命中是数组，按元素合并：
+
+```javascript
+hit1 = { hits: { "b": { "0": [1, 0] } } }
+hit2 = { hits: { "b": { "0": [0, 1] } } }
+
+merged = {
+  hits: {
+    "b": { "0": [1, 1] }  // 按元素求和
+  }
+}
+```
+
+## 聚合模式
+
+### 模式 1: 总覆盖率
+
+聚合特定 `mapHash` 的**所有**命中，忽略 `sceneKey`：
+
+```sql
+SELECT mapHash, SUM(hits) 
+FROM hits 
+WHERE buildHash = ? 
+GROUP BY mapHash
+```
+
+### 模式 2: 特定场景覆盖率
+
+聚合特定 `sceneKey` 的命中：
+
+```sql
+SELECT mapHash, SUM(hits) 
+FROM hits 
+WHERE buildHash = ? AND sceneKey = ? 
+GROUP BY mapHash
+```
+
+### 模式 3: 场景比较
+
+比较不同场景的覆盖率：
+
+```sql
+-- 自动化 vs 手动
+SELECT sceneKey, mapHash, SUM(hits)
+FROM hits
+WHERE buildHash = ? AND sceneKey IN (?, ?)
+GROUP BY sceneKey, mapHash
+```
+
+## 边缘情况
+
+### 情况 1: 映射在命中之后到达
+
+**场景**: 命中在对应的映射之前到达
+
+**行为**: 
+- 命中被存储（故障开放）
+- 映射查找被延迟
+- 关联异步发生
+
+**规则**: 永远不要阻塞命中存储等待映射
+
+### 情况 2: 多个构建，相同映射
+
+**场景**: 相同的 `mapHash` 被多个构建使用
+
+**行为**:
+- 映射被重用（不重复）
+- 命中通过 `build_map_relation` 与构建关联
+- 聚合尊重构建边界
+
+### 情况 3: 插件版本升级
+
+**场景**: 相同的代码，不同的插件版本 → 不同的 `mapHash`
+
+**行为**:
+- 被视为不同的结构
+- 不能跨插件版本合并
+- 历史数据保持有效
+
+## 验证
+
+合并前，验证：
+
+1. ✅ `mapHash` 存在于映射表中
+2. ✅ `buildHash` 匹配
+3. ✅ `sceneKey` 格式有效
+4. ✅ 命中载荷结构匹配模式
+
+## 下一步
+
+- [覆盖率数据模型](/docs/specification/data-model) - 核心实体
+- [映射与命中协议](/docs/specification/protocol) - API 契约
+
