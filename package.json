@@ -24,6 +24,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "4.1.18",
     "@theguild/remark-mermaid": "^0.3.0",
+    "babel-plugin-react-compiler": "^1.0.0",
     "pagefind": "*",
     "tailwindcss": "4.1.18"
   }
