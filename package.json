@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev-docs": "next",
+    "dev": "next",
     "build": "next build",
     "start": "next start",
     "postbuild": "pagefind --site .next/server/app --output-path public/_pagefind"

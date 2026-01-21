@@ -1,5 +1,7 @@
 export default {
-  'babel-plugin': 'Babel 插件',
-  extension: '浏览器扩展',
-  cli: '命令行工具',
+  'babel-plugin': '@canyonjs/babel-plugin',
+  cli: '@canyonjs/cli',
+  'report-html': '@canyonjs/report-html',
+  'git-diff': '@canyonjs/git-diff',
+    extension: 'Canyon Extension',
 };

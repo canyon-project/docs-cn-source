@@ -1,0 +1,117 @@
+# @canyonjs/report-html
+
+一个由 Istanbul 加载，与其报告器接口相匹配。
+
+## 安装
+
+您可以通过 npm 或 yarn 安装 @canyonjs/report-html：
+
+```bash
+npm install --save-dev @canyonjs/report-html
+# 或
+yarn add --dev @canyonjs/report-html
+```
+
+## 基础使用
+
+@canyonjs/report-html 可以直接与 nyc（Istanbul 的命令行接口）一起使用，生成 HTML 格式的代码覆盖率报告。
+
+### 基本命令
+
+```bash
+nyc --reporter=lcov --reporter=text-summary ava
+```
+
+### 使用 @canyonjs/report-html 作为报告器
+
+```bash
+nyc --reporter=@canyonjs/report-html ava
+```
+
+### 组合多个报告器
+
+您可以同时使用多个报告器，例如：
+
+```bash
+nyc --reporter=@canyonjs/report-html --reporter=text-summary ava
+```
+
+## 配置选项
+
+### 在 package.json 中配置
+
+您可以在项目的 package.json 文件中配置 nyc，指定使用 @canyonjs/report-html 作为报告器：
+
+```json
+{
+  "nyc": {
+    "reporters": [
+      "@canyonjs/report-html",
+      "text-summary"
+    ]
+  }
+}
+```
+
+### 命令行选项
+
+您可以通过命令行参数指定报告输出目录等选项：
+
+```bash
+nyc --reporter=@canyonjs/report-html --report-dir=./coverage-report ava
+```
+
+## 报告内容
+
+@canyonjs/report-html 生成的 HTML 报告包含以下内容：
+
+- 项目的整体覆盖率统计数据
+- 按文件分组的详细覆盖率信息
+- 代码行级别的覆盖状态标记
+- 分支、函数和语句的覆盖率详情
+
+## 最佳实践
+
+1. **与测试框架集成**：将覆盖率报告生成命令添加到您的测试脚本中
+2. **CI/CD 集成**：在持续集成过程中自动生成和存档覆盖率报告
+3. **定期分析**：定期查看覆盖率报告，识别未覆盖的代码区域
+4. **设置覆盖率阈值**：使用 nyc 的 `--check-coverage` 选项设置覆盖率阈值
+
+## 示例
+
+### 完整的测试脚本配置
+
+在 package.json 中：
+
+```json
+{
+  "scripts": {
+    "test": "nyc --reporter=@canyonjs/report-html --reporter=text-summary ava",
+    "test:coverage": "nyc --reporter=@canyonjs/report-html --reporter=text-summary --check-coverage --lines=80 ava"
+  }
+}
+```
+
+### 运行测试并生成报告
+
+```bash
+npm test
+# 或
+npm run test:coverage
+```
+
+运行后，您可以在默认的 `./coverage` 目录中找到生成的 HTML 报告。
+
+## 测试框架示例
+
+以下是 @canyonjs/report-html 在不同测试框架中的使用示例：
+
+| 测试框架 | 示例链接 |
+|---------|---------|
+| Vitest | [report-html-vitest](https://github.com/canyon-project/canyon/tree/main/examples/report-html-vitest) |
+| RSTest | [report-html-rstest](https://github.com/canyon-project/canyon/tree/main/examples/report-html-rstest) |
+| Mocha | [report-html-mocha](https://github.com/canyon-project/canyon/tree/main/examples/report-html-mocha) |
+| Jest | [report-html-jest](https://github.com/canyon-project/canyon/tree/main/examples/report-html-jest) |
+| NYC | 可与上述任何测试框架一起使用，如 `nyc --reporter=@canyonjs/report-html ava` |
+
+这些示例展示了如何在不同的测试框架中集成和使用 @canyonjs/report-html 生成代码覆盖率报告。
