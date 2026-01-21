@@ -1,0 +1,241 @@
+# @canyonjs/playwright
+
+@canyonjs/playwright 是一个为 Playwright 测试框架提供代码覆盖率收集功能的 NPM 包，帮助您在端到端测试中获取准确的代码覆盖率数据。
+
+import { Callout } from 'nextra/components'
+
+<Callout type="info" emoji="ℹ️">
+  @canyonjs/playwright 与 Canyon 生态系统无缝集成，为您的端到端测试提供完整的覆盖率解决方案。
+</Callout>
+
+## 功能特性
+
+- **端到端测试覆盖率**：在 Playwright 测试中收集准确的代码覆盖率数据
+- **与 Canyon 集成**：与 Canyon 核心功能无缝协作
+- **支持多种浏览器**：覆盖 Chromium、Firefox、WebKit 等主流浏览器
+- **灵活配置**：支持自定义覆盖率收集选项
+- **详细报告**：生成易于理解的覆盖率报告
+
+## 安装
+
+您可以通过 npm 或 yarn 安装 @canyonjs/playwright：
+
+```bash npm2yarn
+npm install --save-dev @canyonjs/playwright playwright
+```
+
+## 使用
+
+### 基础配置
+
+在您的 Playwright 配置文件中添加 @canyonjs/playwright 插件：
+
+```js filename="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+import { canyonPlaywrightPlugin } from '@canyonjs/playwright';
+
+export default defineConfig({
+  testDir: './tests',
+  reporter: [
+    ['html'],
+    ['@canyonjs/playwright/reporter']
+  ],
+  use: {
+    baseURL: 'http://localhost:3000',
+    screenshot: 'only-on-failure',
+  },
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+  },
+  // 注册 Canyon Playwright 插件
+  ...canyonPlaywrightPlugin({
+    // 配置选项
+    projectId: 'your-project-id',
+    collectCoverage: true,
+    coverageDirectory: './coverage-playwright',
+  }),
+});
+```
+
+### 测试文件示例
+
+```js filename="tests/example.spec.ts"
+import { test, expect } from '@playwright/test';
+
+test('首页加载测试', async ({ page }) => {
+  await page.goto('/');
+  await expect(page).toHaveTitle('My App');
+  await expect(page.locator('h1')).toContainText('Welcome');
+});
+
+test('登录功能测试', async ({ page }) => {
+  await page.goto('/login');
+  await page.fill('#username', 'testuser');
+  await page.fill('#password', 'password');
+  await page.click('button[type="submit"]');
+  await expect(page).toHaveURL('/dashboard');
+});
+```
+
+## 配置选项
+
+### 插件配置
+
+| 选项 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `projectId` | `string` | `undefined` | Canyon 项目 ID |
+| `collectCoverage` | `boolean` | `true` | 是否收集覆盖率数据 |
+| `coverageDirectory` | `string` | `'./coverage-playwright'` | 覆盖率报告输出目录 |
+| `reporterOptions` | `object` | `{}` | 覆盖率报告配置选项 |
+| `browserContextOptions` | `object` | `{}` | 浏览器上下文配置选项 |
+
+### 环境变量
+
+| 环境变量 | 描述 | 默认值 |
+|---------|------|--------|
+| `CANYON_PROJECT_ID` | Canyon 项目 ID | `undefined` |
+| `CANYON_COLLECT_COVERAGE` | 是否收集覆盖率数据 | `true` |
+| `CANYON_COVERAGE_DIRECTORY` | 覆盖率报告输出目录 | `./coverage-playwright` |
+
+## 覆盖率报告
+
+@canyonjs/playwright 支持生成多种格式的覆盖率报告：
+
+### 内置报告
+
+- **HTML 报告**：生成可视化的 HTML 覆盖率报告
+- **JSON 报告**：生成机器可读的 JSON 覆盖率数据
+- **文本报告**：在控制台输出简洁的文本覆盖率摘要
+
+### 与 Canyon 集成
+
+您可以将 @canyonjs/playwright 与 Canyon 核心功能结合使用：
+
+```bash
+# 运行测试并收集覆盖率
+npx playwright test
+
+# 将覆盖率数据上传到 Canyon
+npx canyon upload --directory ./coverage-playwright
+```
+
+## 最佳实践
+
+1. **与开发服务器配合**：在配置中使用 `webServer` 选项启动开发服务器，确保测试环境一致性
+
+2. **合理设置测试目录**：将测试文件组织在专门的目录中，便于管理
+
+3. **使用多种浏览器**：配置多个浏览器环境，确保跨浏览器兼容性
+
+4. **结合其他 Canyon 工具**：与 @canyonjs/report-html、@canyonjs/git-diff 等工具结合使用
+
+5. **CI/CD 集成**：在持续集成流程中添加覆盖率检查
+
+## 示例配置
+
+### 完整的 Playwright 配置
+
+```js filename="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+import { canyonPlaywrightPlugin } from '@canyonjs/playwright';
+
+export default defineConfig({
+  testDir: './tests',
+  timeout: 30 * 1000,
+  expect: {
+    timeout: 5000
+  },
+  reporter: [
+    ['html'],
+    ['@canyonjs/playwright/reporter', {
+      outputFile: './coverage-playwright/report.json'
+    }]
+  ],
+  use: {
+    baseURL: 'http://localhost:3000',
+    browserName: 'chromium',
+    headless: true,
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+  },
+  projects: [
+    {
+      name: 'chromium',
+      use: { browserName: 'chromium' },
+    },
+    {
+      name: 'firefox',
+      use: { browserName: 'firefox' },
+    },
+    {
+      name: 'webkit',
+      use: { browserName: 'webkit' },
+    },
+  ],
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+  },
+  ...canyonPlaywrightPlugin({
+    projectId: process.env.CANYON_PROJECT_ID,
+    collectCoverage: true,
+    coverageDirectory: './coverage-playwright',
+    reporterOptions: {
+      reportDir: './coverage-playwright/html',
+      thresholds: {
+        branches: 80,
+        functions: 80,
+        lines: 80,
+        statements: 80,
+      },
+    },
+  }),
+});
+```
+
+## 常见问题
+
+### 覆盖率数据为空
+
+**解决方案**：
+- 确保您的应用已正确构建，包含覆盖率工具
+- 检查 `collectCoverage` 配置是否为 `true`
+- 验证应用服务器是否正常运行
+
+### 浏览器启动失败
+
+**解决方案**：
+- 确保 Playwright 浏览器已正确安装（运行 `npx playwright install`）
+- 检查系统资源是否充足
+- 验证浏览器配置是否正确
+
+### 报告生成失败
+
+**解决方案**：
+- 确保输出目录存在且可写
+- 检查报告配置选项是否正确
+- 验证覆盖率数据格式是否有效
+
+## 与其他测试框架的比较
+
+| 特性 | @canyonjs/playwright | 原生 Playwright | 其他覆盖率工具 |
+|------|---------------------|----------------|---------------|
+| 端到端测试覆盖率 | ✅ | ❌ | 部分支持 |
+| Canyon 集成 | ✅ | ❌ | ❌ |
+| 多浏览器支持 | ✅ | ✅ | 部分支持 |
+| 详细报告 | ✅ | ❌ | 部分支持 |
+| 灵活配置 | ✅ | 有限 | 部分支持 |
+
+## 总结
+
+@canyonjs/playwright 为您的端到端测试提供了完整的覆盖率解决方案，与 Canyon 生态系统无缝集成，帮助您：
+
+- 在 Playwright 测试中收集准确的代码覆盖率数据
+- 生成易于理解的覆盖率报告
+- 与其他 Canyon 工具协同工作
+- 持续监控代码质量
+
+通过使用 @canyonjs/playwright，您可以确保端到端测试不仅验证功能正确性，还能提供有价值的代码覆盖率信息，从而全面提高代码质量和可靠性。
