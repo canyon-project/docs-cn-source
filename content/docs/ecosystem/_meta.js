@@ -3,5 +3,4 @@ export default {
   cli: '@canyonjs/cli',
   'report-html': '@canyonjs/report-html',
   'git-diff': '@canyonjs/git-diff',
-    extension: 'Canyon Extension',
 };
