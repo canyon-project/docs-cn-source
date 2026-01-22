@@ -41,18 +41,16 @@
 
 * **变更代码覆盖率（文件级）**：
 
-```math
-coverage_f =
-\begin{cases}
-\dfrac{|C_f|}{|I_f|} & \text{if } |I_f| > 0 \\
-\text{无新增可执行语句（见策略）} & \text{if } |I_f| = 0
-\end{cases}
-```
+### 文件级变更覆盖率计算
 
 ```math
-coverage_{change} =
-\dfrac{\sum_f |C_f|}{\sum_f |I_f|}
-\quad (\text{仅当 } \sum_f |I_f| > 0)
+coverage_f = \begin{cases} \dfrac{|C_f|}{|I_f|} & \text{if } |I_f| > 0 \\ \text{无新增可执行语句（见策略）} & \text{if } |I_f| = 0 \end{cases}
+```
+
+### 总体变更覆盖率计算
+
+```math
+coverage_{change} = \dfrac{\sum_f |C_f|}{\sum_f |I_f|} \quad (\text{仅当 } \sum_f |I_f| > 0)
 ```
 
 
