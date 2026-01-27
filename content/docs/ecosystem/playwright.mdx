@@ -1,14 +1,18 @@
+import {Button} from "antd";
+
 # @canyonjs/playwright
+
+<div className={'h-10'}></div>
+
+<Button target={'_blank'} href={'https://github.com/canyon-project/canyon/tree/next/tools/playwright'} icon={<GithubOutlined />} size={'small'}>Source</Button>
 
 为 Playwright 测试提供浏览器端 JavaScript 覆盖率收集。
 
-import { Callout } from 'nextra/components'
+import {GithubOutlined} from "@ant-design/icons";
 
 ### 前置条件
 
-* 你的应用程序必须使用与 Istanbul 兼容的覆盖率插桩
-  （例如，通过 `@canyonjs/swc-plugin`、Babel 或其他支持的插桩工具）
-* Playwright `@playwright/test` ≥ 推荐版本
+* 你的应用程序必须经过 istanbuljs 代码插桩
 
 ---
 
