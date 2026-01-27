@@ -1,32 +1,15 @@
+
+import {Steps} from "nextra/components";
+import Xcxxxx from '../../../components/how-to-jicheng-play.mdx';
+import SetupReactPlaywright from '../../../components/setup-react-playwright.mdx';
+
 # Playwright
 
-在 Playwright 中，获取上下文，在测试用例执行时将覆盖率数据写入本地文件，最后使用 Tools CLI 进行聚合和报告。
+为现代 Web 应用程序提供可靠的端到端测试。
 
-## 将覆盖率数据写入本地文件
 
-我们提供了 @canyonjs/playwright 的npm包，通过继承的方式接入。细节请查看。
+## 以新项目的形式开始
 
-```
-npm i @canyonjs/playwright
-```
-
-```js
-import {test as baseTest} from '@playwright/test';
-import {createCoverageContextFixture} from '@canyonjs/playwright'
- 
-export const test = baseTest.extend({
-  context: createCoverageContextFixture({
-    outputDir:'.canyon_output'
-  })
-});
- 
-export const expect = test.expect;
-```
-
-## 聚合和报告
-
-使用 Tools CLI 进行聚合和报告。具体用法请参见 [Tools CLI](/docs/ecosystem/tools-cli) 文档。
-
-```bash copy
-./canyon-uploader map --dsn=https://canyonjs.org
-```
+<Steps>
+<SetupReactPlaywright/>
+</Steps>

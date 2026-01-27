@@ -1,4 +1,5 @@
 import { Steps, Callout, Cards } from "nextra/components";
+import {RobotOutlined, UserOutlined} from "@ant-design/icons";
 
 # 首次获取覆盖率数据
 
@@ -37,28 +38,6 @@ npm install babel-plugin-istanbul babel-plugin-canyon -D
 
 ![coverage-canyon-console](https://cdn.jsdelivr.net/gh/canyon-project/assets/docs/static/docs/getting-started/first-coverage/coverage-canyon-console.png)
 
-### 配置 CI 环境变量
-
-在 CI 环境中，我们需要配置一些环境变量来报告覆盖率数据。
-
-> [!TIP]
->
-> Canyon 在编译时检测流水线变量，我们支持多种[流水线提供商](/docs/reference/provider)。<br/>
-> 没有看到您的流水线提供商？试试[显式配置](/docs/ecosystem/babel-plugin-canyon#配置)。
-
-
-1. `DSN` 和 `REPORTER`
-
-- **DSN**：覆盖率数据报告的服务地址，格式为 \{\{url\}\}/coverage/client，其中 \{\{url\}\}\ 是 Canyon 服务地址。
-- **REPORTER**：用户令牌，可以在 Canyon 用户设置页面查看。
-
-2. 配置 CI 平台变量
-
-![gitlab](https://cdn.jsdelivr.net/gh/canyon-project/assets/docs/static/docs/getting-started/first-coverage/gitlab-var-config.png)
-
-<Callout type="info" emoji="ℹ️">
-  项目 ID、分支和 SHA 无需手动配置；Canyon 插件会自动检测流水线环境变量。
-</Callout>
 
   ### 更新 Babel 插件激活条件
 
@@ -79,19 +58,22 @@ npm install babel-plugin-istanbul babel-plugin-canyon -D
 
   等待 CI 完成后，将页面部署到测试环境。
 
-  此时，覆盖率数据存储在浏览器中。随着用户交互或 UI 自动化测试的执行，window.__coverage___ 数据将不断累积。
+  > [!TIP]
+  >
+  > 此时，覆盖率数据存储在浏览器中。随着用户交互或 UI 自动化测试的执行，window.\_\_coverage\_\_ 数据将不断累积。您可以选择本地生成覆盖率报告或发送到Canyon服务器。
 
-  将这些数据准确报告到 Canyon 服务器，即可实时显示覆盖率数据。
 
 
-  以下是几种报告覆盖率数据的方式：
+  不同场景下的收集方式：
 
   <Cards>
   <Cards.Card
-    title="UI 自动化测试"
+    icon={<RobotOutlined />}
+    title="自动化测试"
     href="/docs/end-to-end-testing/playwright"
   />
   <Cards.Card
+    icon={<UserOutlined />}
     title="手动测试"
     href="/docs/ecosystem/canyon-extension"
   />
