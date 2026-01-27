@@ -1,14 +1,12 @@
 import { GithubOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 
-### 1. 创建 React TypeScript 项目
+### 创建 React 项目
 
-使用 Vite 创建一个 React TypeScript 项目：
+使用 [Vite](https://vite.dev/) 创建一个 React 项目：
 
 ```sh npm2yarn copy
 npm create vite@latest my-react-app -- --template react-ts
-cd my-react-app
-npm install
 ```
 
 安装代码插桩所需的 Babel 插件：
@@ -17,7 +15,7 @@ npm install
 npm install babel-plugin-istanbul @canyonjs/babel-plugin -D
 ```
 
-### 2. 初始化 Playwright
+### 初始化 Playwright
 
 在项目根目录下初始化 Playwright：
 
@@ -25,9 +23,9 @@ npm install babel-plugin-istanbul @canyonjs/babel-plugin -D
 npm init playwright@latest
 ```
 
-按照提示选择配置选项（推荐选择 TypeScript）。
+按照提示选择配置选项。
 
-### 3. 编写 Playwright 测试用例
+### 编写 Playwright 测试用例
 
 创建一个测试文件来测试你的 React 应用：
 
@@ -36,25 +34,18 @@ import { test, expect } from './baseTest';
 
 test('首页加载测试', async ({ page }) => {
   await page.goto('http://localhost:5173');
-  
-  // 等待页面加载
+
   await expect(page).toHaveTitle(/React/);
-  
-  // 可以添加更多测试断言
-  // 例如：检查特定元素是否存在
-  // await expect(page.locator('h1')).toBeVisible();
 });
 ```
 
-### 4. 安装 @canyonjs/playwright 并创建 baseTest.ts
-
-<Button target={'_blank'} href={'https://github.com/canyon-project/canyon/tree/next/tools/playwright'} icon={<GithubOutlined />} size={'small'}>Source</Button>
+### 安装 @canyonjs/playwright 并创建 baseTest.ts
 
 安装 [`@canyonjs/playwright`](https://www.npmjs.com/package/@canyonjs/playwright) 包：
 
 ```sh npm2yarn copy
 npm install @canyonjs/playwright -D
-``` 
+```
 
 创建 `baseTest.ts` 文件，继承 Playwright 的 test 以支持覆盖率收集：
 
@@ -74,7 +65,7 @@ export const expect = test.expect;
 
 
 
-### 5. 配置 Playwright 在运行时启动开发服务器
+### 配置 Playwright 在运行时启动开发服务器
 
 编辑 `playwright.config.ts`，添加 `webServer` 配置，让 Playwright 在运行测试前自动启动开发服务器：
 
@@ -84,7 +75,7 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   // 测试目录
   testDir: './tests',
-  
+
   // 在运行测试前启动开发服务器
   webServer: {
     command: 'npm run dev',
@@ -92,7 +83,7 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
   },
-  
+
   // 使用项目中的浏览器
   projects: [
     {
@@ -105,7 +96,7 @@ export default defineConfig({
 
 现在运行测试时，Playwright 会自动启动 `npm run dev`，等待服务器就绪后再执行测试用例。
 
-### 6. 配置测试脚本生成覆盖率报告
+### 配置测试脚本生成覆盖率报告
 
 安装生成覆盖率报告所需的依赖：
 
