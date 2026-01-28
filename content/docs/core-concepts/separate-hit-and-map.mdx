@@ -6,13 +6,13 @@ import { Callout } from "nextra/components";
 
 ## 原因
 
-1. **收集完整的编译文件**：在编译过程中，通过 `babel-plugin-canyon` 插件，分析并解析每个编译文件的初始覆盖率文件，并将其保存到 `.canyon_out` 文件夹中。
+1. **收集完整的编译文件**：在编译过程中，通过 `@canyonjs/babel-plugin` 插件，分析并解析每个编译文件的初始覆盖率文件，并将其保存到 `.canyon_out` 文件夹中。
 
 2. **早期收集以减轻压力**：如果不报告初始覆盖率文件，这些覆盖率文件将在 UI 自动化测试期间被报告，这会产生巨大的传输压力。早期收集可以减少超过 90% 的传输压力。
 
 ## 报告初始覆盖率数据
 
-babel-plugin-canyon 插件在编译过程中为编译后的文件生成初始覆盖率文件，并将其保存到 .canyon_output 文件夹中。我们提供了 Tools CLI 命令行工具，您可以在 CI 中使用它向 Canyon 服务器报告。
+@canyonjs/babel-plugin 插件在编译过程中为编译后的文件生成初始覆盖率文件，并将其保存到 .canyon_output 文件夹中。我们提供了 Tools CLI 命令行工具，您可以在 CI 中使用它向 Canyon 服务器报告。
 
 ```yml filename=".github/workflows/report-canyon-output.yml" {19,20} copy
 name: Report Canyon Output

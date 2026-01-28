@@ -17,16 +17,16 @@ import {RobotOutlined, UserOutlined} from "@ant-design/icons";
 Babel 是前端工程化和模块化开发中不可或缺的工具。对于 Babel 项目，您只需安装两个 Babel 插件即可快速开始。
 
 ```sh npm2yarn
-npm install babel-plugin-istanbul babel-plugin-canyon -D
+npm install babel-plugin-istanbul @canyonjs/babel-plugin -D
 ```
 
-将 [`istanbul`](https://www.npmjs.com/package/babel-plugin-istanbul) 和 [`canyon`](https://www.npmjs.com/package/babel-plugin-canyon) 插件添加到您的 [Babel 配置文件](https://babeljs.io/docs/config-files#configuration-file-types)中：
+将 [`istanbul`](https://www.npmjs.com/package/babel-plugin-istanbul) 和 [`canyon`](https://www.npmjs.com/package/@canyonjs/babel-plugin) 插件添加到您的 [Babel 配置文件](https://babeljs.io/docs/config-files#configuration-file-types)中：
 
   ```js filename="babel.config.js" {3,4} copy
   module.exports = {
     plugins: [
       'istanbul',
-      'canyon'
+      '@canyonjs'
       // 注意插件顺序：canyon 插件应在 istanbul 插件之后
       ],
   };
@@ -49,7 +49,7 @@ npm install babel-plugin-istanbul babel-plugin-canyon -D
               process.env.CI_COMMIT_REF_NAME !== 'release')
               ? [
                 'istanbul',
-                'canyon'
+                '@canyonjs'
               ]:[],
   };
   ```
@@ -70,7 +70,7 @@ npm install babel-plugin-istanbul babel-plugin-canyon -D
   <Cards.Card
     icon={<RobotOutlined />}
     title="自动化测试"
-    href="/docs/end-to-end-testing/playwright"
+    href="/docs/end-to-end-testing/getting-started"
   />
   <Cards.Card
     icon={<UserOutlined />}
